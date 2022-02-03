@@ -27,7 +27,7 @@ message_length = {
     b'N': 19,  # rpii_message
 }
 
-nasdaq_tz = pytz.timezone('US/Eastern')
+nasdaq_tz = pytz.timezone('UTC')
 
 
 def to_int(arr):
@@ -45,6 +45,9 @@ def process_file(file, pointer):
         data = file.read(message_length[message_type])
 
         order_number = to_int(data[10:18])  # not correct for P and Q (trade) messages
+
+        if message_type == b'B':
+            print(message_type)
 
         if symbol_locate != data[0:2]:
             continue
