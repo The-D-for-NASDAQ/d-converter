@@ -75,7 +75,7 @@ def process_file(file, pointer):
                     Date,
                     to_timestamp(data[4:10]),
                     order_number,
-                    'ADD BID' if data[18] == b'B' else 'ADD ASK',
+                    'ADD BID' if data[18:19] == b'B' else 'ADD ASK',
                     symbol,
                     to_int(data[31:35]) / 1e4,
                     to_int(data[19:23]),
@@ -89,11 +89,11 @@ def process_file(file, pointer):
                     Date,
                     to_timestamp(data[4:10]),
                     order_number,
-                    'ADD BID' if data[18] == b'B' else 'ADD ASK',
+                    'ADD BID' if data[18:19] == b'B' else 'ADD ASK',
                     symbol,
                     to_int(data[31:35]) / 1e4,
                     to_int(data[19:23]),
-                    data[35:39],
+                    str(data[35:39]),
                     'NASDAQ'
                 ]
                 file_order_number_pointers[order_number] = {'pointer': start_message_pointer, 'message_type': message_type}
@@ -103,11 +103,11 @@ def process_file(file, pointer):
                     Date,
                     to_timestamp(data[4:10]),
                     order_number,
-                    'EXECUTE BID' if message_with_all_data[19] == b'B' else 'EXECUTE ASK',
+                    'EXECUTE BID' if message_with_all_data[19:20] == b'B' else 'EXECUTE ASK',
                     symbol,
                     0,
                     to_int(message_with_all_data[20:24]),
-                    message_with_all_data[36:40] if file_order_number_pointer['message_type'] == b'F' else None,
+                    str(message_with_all_data[36:40]) if file_order_number_pointer['message_type'] == b'F' else None,
                     'NASDAQ'
                 ]
                 pointer += 1
@@ -116,11 +116,11 @@ def process_file(file, pointer):
                     Date,
                     to_timestamp(data[4:10]),
                     order_number,
-                    'EXECUTE BID' if message_with_all_data[19] == b'B' else 'EXECUTE ASK',
+                    'EXECUTE BID' if message_with_all_data[19:20] == b'B' else 'EXECUTE ASK',
                     symbol,
                     to_int(data[31:35]) / 1e4,
                     to_int(message_with_all_data[20:24]),
-                    message_with_all_data[36:40] if file_order_number_pointer['message_type'] == b'F' else None,
+                    str(message_with_all_data[36:40]) if file_order_number_pointer['message_type'] == b'F' else None,
                     'NASDAQ'
                 ]
                 pointer += 1
@@ -129,11 +129,11 @@ def process_file(file, pointer):
                     Date,
                     to_timestamp(data[4:10]),
                     order_number,
-                    'CANCEL BID' if message_with_all_data[19] == b'B' else 'CANCEL ASK',
+                    'CANCEL BID' if message_with_all_data[19:20] == b'B' else 'CANCEL ASK',
                     symbol,
                     0,
                     to_int(data[18:22]),
-                    message_with_all_data[36:40] if file_order_number_pointer['message_type'] == b'F' else None,
+                    str(message_with_all_data[36:40]) if file_order_number_pointer['message_type'] == b'F' else None,
                     'NASDAQ'
                 ]
                 pointer += 1
@@ -142,11 +142,11 @@ def process_file(file, pointer):
                     Date,
                     to_timestamp(data[4:10]),
                     order_number,
-                    'DELETE BID' if message_with_all_data[19] == b'B' else 'DELETE ASK',
+                    'DELETE BID' if message_with_all_data[19:20] == b'B' else 'DELETE ASK',
                     symbol,
                     0,
                     0,
-                    message_with_all_data[36:40] if file_order_number_pointer['message_type'] == b'F' else None,
+                    str(message_with_all_data[36:40]) if file_order_number_pointer['message_type'] == b'F' else None,
                     'NASDAQ'
                 ]
                 pointer += 1
@@ -155,11 +155,11 @@ def process_file(file, pointer):
                     Date,
                     to_timestamp(data[4:10]),
                     order_number,
-                    'DELETE BID' if message_with_all_data[19] == b'B' else 'DELETE ASK',
+                    'DELETE BID' if message_with_all_data[19:20] == b'B' else 'DELETE ASK',
                     symbol,
                     0,
                     0,
-                    message_with_all_data[36:40] if file_order_number_pointer['message_type'] == b'F' else None,
+                    str(message_with_all_data[36:40]) if file_order_number_pointer['message_type'] == b'F' else None,
                     'NASDAQ'
                 ]
                 replaced_order_number = to_int(data[18:26])
@@ -167,21 +167,21 @@ def process_file(file, pointer):
                     Date,
                     to_timestamp(data[4:10]),
                     replaced_order_number,
-                    'ADD BID' if message_with_all_data[18] == b'B' else 'ADD ASK',
+                    'ADD BID' if message_with_all_data[19:20] == b'B' else 'ADD ASK',
                     symbol,
                     to_int(data[30:34]) / 1e4,
                     to_int(data[26:30]),
-                    message_with_all_data[36:40] if file_order_number_pointer['message_type'] == b'F' else None,
+                    str(message_with_all_data[36:40]) if file_order_number_pointer['message_type'] == b'F' else None,
                     'NASDAQ'
                 ]
-                file_order_number_pointers[replaced_order_number] = {'pointer': start_message_pointer, 'message_type': message_type}
+                file_order_number_poinZters[replaced_order_number] = {'pointer': start_message_pointer, 'message_type': message_type}
                 pointer += 1
             case b'P':  # non_cross_trade_message
                 symbol_data_dict[pointer] = [
                     Date,
                     to_timestamp(data[4:10]),
                     0,
-                    'TRADE BID' if data[18] == b'B' else 'TRADE ASK',
+                    'TRADE BID' if data[18:19] == b'B' else 'TRADE ASK',
                     symbol,
                     to_int(data[31:35]) / 1e4,
                     to_int(data[19:23]),
@@ -237,6 +237,6 @@ if __name__ == '__main__':
     symbol_data_df.columns = ['Date', 'Timestamp', 'OrderNumber', 'EventType', 'Ticker', 'Price', 'Quantity', 'MPID',
                               'Exchange']
 
-    symbol_data_df.to_csv(symbol + Date + '.csv', index=False)
+    symbol_data_df.to_csv(symbol + Date + '.csv', index=False, float_format='%.2f')
 
     print(datetime.now() - begin_time)
