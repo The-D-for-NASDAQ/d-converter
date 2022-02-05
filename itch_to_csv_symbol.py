@@ -56,6 +56,7 @@ def process_file(file, pointer):
             old_pointer = file.tell()
             file_order_number_pointer = file_order_number_pointers[order_number]
             file.seek(file_order_number_pointer['pointer'])
+            # if message_with_all_data has b'U' type than side and other data from it will be INCORRECT!!!!!
             message_with_all_data = file.read(message_length[file_order_number_pointer['message_type']] + 1)  # +1 because message type included
             file.seek(old_pointer)
 
@@ -106,7 +107,7 @@ def process_file(file, pointer):
                     'EXECUTE BID' if message_with_all_data[19:20] == b'B' else 'EXECUTE ASK',
                     symbol,
                     0,
-                    to_int(message_with_all_data[20:24]),
+                    to_int(data[18:22]),
                     str(message_with_all_data[36:40]) if file_order_number_pointer['message_type'] == b'F' else None,
                     'NASDAQ'
                 ]
@@ -119,7 +120,7 @@ def process_file(file, pointer):
                     'EXECUTE BID' if message_with_all_data[19:20] == b'B' else 'EXECUTE ASK',
                     symbol,
                     to_int(data[31:35]) / 1e4,
-                    to_int(message_with_all_data[20:24]),
+                    to_int(data[18:22]),
                     str(message_with_all_data[36:40]) if file_order_number_pointer['message_type'] == b'F' else None,
                     'NASDAQ'
                 ]
@@ -162,11 +163,12 @@ def process_file(file, pointer):
                     str(message_with_all_data[36:40]) if file_order_number_pointer['message_type'] == b'F' else None,
                     'NASDAQ'
                 ]
-                replaced_order_number = to_int(data[18:26])
+                pointer += 1
+                new_order_number = to_int(data[18:26])
                 symbol_data_dict[pointer] = [
                     Date,
                     to_timestamp(data[4:10]),
-                    replaced_order_number,
+                    new_order_number,
                     'ADD BID' if message_with_all_data[19:20] == b'B' else 'ADD ASK',
                     symbol,
                     to_int(data[30:34]) / 1e4,
@@ -174,8 +176,8 @@ def process_file(file, pointer):
                     str(message_with_all_data[36:40]) if file_order_number_pointer['message_type'] == b'F' else None,
                     'NASDAQ'
                 ]
-                file_order_number_pointers[replaced_order_number] = {'pointer': start_message_pointer, 'message_type': message_type}
                 pointer += 1
+                file_order_number_pointers[new_order_number] = file_order_number_pointers[order_number]
             case b'P':  # non_cross_trade_message
                 symbol_data_dict[pointer] = [
                     Date,
