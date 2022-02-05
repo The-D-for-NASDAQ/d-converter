@@ -174,7 +174,7 @@ def process_file(file, pointer):
                     str(message_with_all_data[36:40]) if file_order_number_pointer['message_type'] == b'F' else None,
                     'NASDAQ'
                 ]
-                file_order_number_poinZters[replaced_order_number] = {'pointer': start_message_pointer, 'message_type': message_type}
+                file_order_number_pointers[replaced_order_number] = {'pointer': start_message_pointer, 'message_type': message_type}
                 pointer += 1
             case b'P':  # non_cross_trade_message
                 symbol_data_dict[pointer] = [
