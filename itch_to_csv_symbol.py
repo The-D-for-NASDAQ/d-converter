@@ -27,7 +27,7 @@ message_length = {
     b'N': 19,  # rpii_message
 }
 
-nasdaq_tz = pytz.timezone('UTC')
+nasdaq_tz = pytz.timezone('US/Eastern')
 
 
 def to_int(arr):
@@ -35,7 +35,7 @@ def to_int(arr):
 
 
 def to_timestamp(arr):
-    return datetime.fromtimestamp(to_int(arr) / 1e9, tz=nasdaq_tz).strftime('%H:%M:%S.%f')[:-3]
+    return datetime.fromtimestamp(to_int(arr) / 1e9, tz=pytz.utc).strftime('%H:%M:%S.%f')[:-3]
 
 
 def process_file(file, pointer):
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     with open(file_path, 'rb') as f:
         symbol_locate = get_symbol_locate(f)
 
-    Date = datetime.now().strftime('%Y%m%d')
+    Date = datetime.now(tz=nasdaq_tz).strftime('%Y%m%d')
 
     file_order_number_pointers = {}
 
@@ -236,8 +236,7 @@ if __name__ == '__main__':
         process_file(f, symbol_data_dict_pointer)
 
     symbol_data_df = pd.DataFrame.from_dict(symbol_data_dict, orient='index')
-    symbol_data_df.columns = ['Date', 'Timestamp', 'OrderNumber', 'EventType', 'Ticker', 'Price', 'Quantity', 'MPID',
-                              'Exchange']
+    symbol_data_df.columns = ['Date', 'Timestamp', 'OrderNumber', 'EventType', 'Ticker', 'Price', 'Quantity', 'MPID', 'Exchange']
 
     symbol_data_df.to_csv(symbol + Date + '.csv', index=False, float_format='%.2f')
 
