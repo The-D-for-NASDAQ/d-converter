@@ -237,7 +237,7 @@ def convert_to_csv(process_until):
         file_pointer = file.tell()
 
 
-def save_to_csv():
+def save_to_csv(process_until):
     global symbol_data_dict, symbol_data_dict_pointer
 
     if not symbol_data_dict:
@@ -246,7 +246,11 @@ def save_to_csv():
     symbol_data_df = pd.DataFrame.from_dict(symbol_data_dict, orient='index')
     symbol_data_df.columns = ['Date', 'Timestamp', 'OrderNumber', 'EventType', 'Ticker', 'Price', 'Quantity', 'MPID', 'Exchange']
 
-    symbol_data_df_path = symbol + date + '.csv'
+    base_file_path = 'data/' + date + '/' + symbol + '/'
+    if not os.path.exists(base_file_path):
+        os.makedirs(base_file_path)
+
+    symbol_data_df_path = base_file_path + process_until.strftime('%H%M') + '.csv'
 
     symbol_data_df.to_csv(
         symbol_data_df_path,

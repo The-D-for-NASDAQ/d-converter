@@ -25,7 +25,7 @@ while process_iteration_until < end_trading_time:
 
     master.convert_to_csv(process_iteration_until)
     added_rows = str(len(master.symbol_data_dict))
-    master.save_to_csv()
+    master.save_to_csv(process_iteration_until)
     print('At: ' + str(datetime.now(tz=master.nasdaq_tz)) + ' | ' + 'Processed until: ' + str(process_iteration_until) + ' | ' + 'Processing time: ' + str(datetime.now() - begin_time) + ' | ' + 'Added rows: ' + added_rows)
 
     process_iteration_until = process_iteration_until + timedelta(minutes=1)
