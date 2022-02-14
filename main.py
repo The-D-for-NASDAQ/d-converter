@@ -2,6 +2,15 @@ import sys
 import master
 from datetime import datetime, timedelta
 from time import sleep
+import pika
+
+
+def send_processed_date_to_compressor(processed_until):
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue='compressor')
+    channel.basic_publish(exchange='', routing_key='compressor', body=str(processed_until))
+    connection.close()
 
 
 date = master.date
@@ -26,6 +35,9 @@ while process_iteration_until < end_trading_time:
     master.convert_to_csv(process_iteration_until)
     added_rows = str(len(master.symbol_data_dict))
     master.save_to_csv(process_iteration_until)
+
+    send_processed_date_to_compressor(process_iteration_until)
+
     print('At: ' + str(datetime.now(tz=master.nasdaq_tz)) + ' | ' + 'Processed until: ' + str(process_iteration_until) + ' | ' + 'Processing time: ' + str(datetime.now() - begin_time) + ' | ' + 'Added rows: ' + added_rows)
 
     process_iteration_until = process_iteration_until + timedelta(minutes=1)
@@ -35,4 +47,3 @@ while process_iteration_until < end_trading_time:
         print('Sleeping seconds: ' + str(to_next_run.total_seconds()))
         sleep(to_next_run.total_seconds())
 
-# send events from 9:30 (start of trading session)
