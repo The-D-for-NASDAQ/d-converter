@@ -9,7 +9,7 @@ def send_processed_date_to_compressor(processed_until):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
     channel.queue_declare(queue='compressor')
-    channel.basic_publish(exchange='', routing_key='compressor', body=str(processed_until))
+    channel.basic_publish(exchange='', routing_key='compressor', body=processed_until.isoformat())
     connection.close()
 
 
@@ -38,7 +38,10 @@ while process_iteration_until < end_trading_time:
 
     send_processed_date_to_compressor(process_iteration_until)
 
-    print('At: ' + str(datetime.now(tz=master.nasdaq_tz)) + ' | ' + 'Processed until: ' + str(process_iteration_until) + ' | ' + 'Processing time: ' + str(datetime.now() - begin_time) + ' | ' + 'Added rows: ' + added_rows)
+    print('At: ' + str(datetime.now(tz=master.nasdaq_tz)) +
+          ' | Processed date: ' + str(process_iteration_until) +
+          ' | Processing time: ' + str(datetime.now() - begin_time) +
+          ' | Added rows: ' + added_rows)
 
     process_iteration_until = process_iteration_until + timedelta(minutes=1)
     to_next_run = process_iteration_until - datetime.now(tz=master.nasdaq_tz).replace()
